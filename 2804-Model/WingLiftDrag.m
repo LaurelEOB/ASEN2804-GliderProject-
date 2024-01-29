@@ -63,8 +63,8 @@ for n = 1:Count
         f_taper = 0.0524*Design_Input.Taper_w(n)^4-0.15*Design_Input.Taper_w(n)^3+0.1659*Design_Input.Taper_w(n)^2-0.0706*Design_Input.Taper_w(n)+0.0119;
         e(n)=1/(1+f_taper*Design_Input.AR_w(n));
     else % If there is quarter chord sweep:
-        f_taper = ;
-        e(n) = ;
+        f_taper = 0.0524*Design_Input.Taper_w(n)^4-0.15*Design_Input.Taper_w(n)^3+0.1659*Design_Input.Taper_w(n)^2-0.0706*Design_Input.Taper_w(n)+0.0119;
+        e(n) = (1/(1+f_taper*Design_Input.AR_w(n))) * cos(QuarterSweep_w(n));
     end
     % Linear fit to Airfoil lift data
     Cl = polyfit(AoA(1:12),Airfoil{n,(5:16)},1); % Reffer to MATLAB documentation for this function's usage
