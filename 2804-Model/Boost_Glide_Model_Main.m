@@ -9,6 +9,7 @@
 clear
 % clearvars
 close all
+clc;
 
 % removes warnings for table variable names for a cleaner output
 warning('OFF', 'MATLAB:table:ModifiedAndSavedVarnames')

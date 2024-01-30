@@ -11,11 +11,12 @@ function [InducedDrag_Data] =...
 % Additionally, this code supports the calculation of the k2 values for
 % evaluating non-symmetric airfoil design, but is not required.
 
-%% Outputs:
+%% Outputs
 %
 % InducedDrag_Data:
-%   Table containing lift curve slope, zero lift AoA, and oswalds info
-%   (columns) for each input (rows)
+% Table containing oswalds and calculated k1 and k2 values for three
+% different models for oswalds (denoted by suffixes _mod1, _mod2, and
+% _mod3)(columns) for each input from the design input spreadsheet (rows)
 
 
 %% Preallocate variables of interest

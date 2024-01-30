@@ -25,18 +25,18 @@ for n = 1:Count
 % MODIFY THIS SECTION
 % /////////////////////////////////////////////////////////////////////////
     % Find Wing Span from AR and Sref
-    b_w(n)= ;
+    b_w(n)= sqrt(Design_Input.Sref_w(n)*Design_Input.AR_w(n)) ; %
     
     %Find Wing Root and Tip Chord from S and Taper Ratio
-    cr_w(n)= ;
-    ct_w(n)= ;
+    cr_w(n)= (Design_Input.Sref_w(n) * (2/b_w(n)))/(1+Design_Input.Taper_w(n));
+    ct_w(n)= Design_Input.Taper_w(n) * cr_w(n);
     
     %Calculate Wing Mean Aerodynamic Chord (MAC)
-    MAC_w(n)=;
+    MAC_w(n)= (2/3)*cr_w(n)*( (1+Design_Input.Taper_w(n)+(Design_Input.Taper_w(n)*Design_Input.Taper_w(n)) )/(1+Design_Input.Taper_w(n)));
 
     %Find x and y location for wing MAC from leading edge of root chord
-    y_MAC_w(n)=  ;
-    x_MAC_w(n)= ;
+    y_MAC_w(n)=  (b_w(n)/6)*((1+(2*Design_Input.Taper_w(n)))/(1+Design_Input.Taper_w(n)));
+    x_MAC_w(n)= y_MAC_w(n) * tan(Design_Input.Sweep_w(n)) +(0.25*MAC_w(n));
 % /////////////////////////////////////////////////////////////////////////
 % END OF SECTION TO MODIFY
 % /////////////////////////////////////////////////////////////////////////
