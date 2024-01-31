@@ -30,6 +30,7 @@ W_water = zeros(Count, 1); % Water weight [N]
 W_pay = zeros(Count, 1); % Payload weight [N]
 W_ballast = zeros(Count, 1); % Ballast Weight [N]
 
+
 CG_tot = zeros(Count, 1); % Overall CG [m]
 CG_f = zeros(Count, 1); % Fusalage CG [m]
 CG_w = zeros(Count, 1); % Wing CG [m]
