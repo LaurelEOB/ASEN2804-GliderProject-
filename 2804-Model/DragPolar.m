@@ -30,9 +30,9 @@ for n = 1:Count
 % /////////////////////////////////////////////////////////////////////////
 % MODIFY THIS SECTION
 % /////////////////////////////////////////////////////////////////////////
-    DragPolar_mod1(n,:)= ;
-    DragPolar_mod2(n,:)= ;
-    DragPolar_mod3(n,:)= ;
+    DragPolar_mod1(n,:)= Parasite_Drag_Data.CDo(n) + ((WingLiftCurve{n,:}).^2)/(pi*InducedDrag_Data.eo_mod1(n)*Design_Input.AR_w(n));
+    DragPolar_mod2(n,:)= Parasite_Drag_Data.CDo(n) + ((WingLiftCurve{n,:}).^2)/(pi*InducedDrag_Data.eo_mod2(n)*Design_Input.AR_w(n));
+    DragPolar_mod3(n,:)= Parasite_Drag_Data.CDo(n) + ((WingLiftCurve{n,:}).^2)/(pi*InducedDrag_Data.eo_mod3(n)*Design_Input.AR_w(n));
 % /////////////////////////////////////////////////////////////////////////
 % END OF SECTION TO MODIFY
 % /////////////////////////////////////////////////////////////////////////

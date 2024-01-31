@@ -95,7 +95,7 @@ WingGeo_Data = WingGeo(Design_Input,Count); %Calculate specific wing geometry fr
 
 % Call Induced Drag Model Function
 InducedDrag_Data = ...
-    InducedDrag(Design_Input,WingLiftModel,WingLiftCurve,WingDragCurve,WingGeo_Data,Count);
+    InducedDrag(Design_Input,WingLiftModel,WingLiftCurve,WingDragCurve,WingGeo_Data,Count,Parasite_Drag_Data);
 
 % Call Complete Drag Polar Function
 [DragPolar_mod1,DragPolar_mod2,DragPolar_mod3] = ...

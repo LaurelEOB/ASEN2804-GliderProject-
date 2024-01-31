@@ -1,5 +1,5 @@
 function [InducedDrag_Data] =...
-    InducedDrag(Design_Input,WingLiftModel,WingLiftCurve,WingDragCurve,WingGeo_Data,Count)
+    InducedDrag(Design_Input,WingLiftModel,WingLiftCurve,WingDragCurve,WingGeo_Data,Count, Parasite_Drag_Data)
 %% Induced Drag Model Function Summary
 % This function evaluates different Oswalds Efficiency Factor models for 
 % use in your drag polar model.  It compiles and outputs a variables table
@@ -11,12 +11,11 @@ function [InducedDrag_Data] =...
 % Additionally, this code supports the calculation of the k2 values for
 % evaluating non-symmetric airfoil design, but is not required.
 
-%% Outputs
+%% Outputs:
 %
 % InducedDrag_Data:
-% Table containing oswalds and calculated k1 and k2 values for three
-% different models for oswalds (denoted by suffixes _mod1, _mod2, and
-% _mod3)(columns) for each input from the design input spreadsheet (rows)
+%   Table containing lift curve slope, zero lift AoA, and oswalds info
+%   (columns) for each input (rows)
 
 
 %% Preallocate variables of interest
@@ -47,17 +46,21 @@ for n = 1:Count
     k1_mod1(n) =  1/(pi*eo_mod1(n)*Design_Input.AR_w(n));
     k2_mod1(n) = -2*k1_mod1(n)*CL_minD;
 
-    %Student Option 1 Oswalds Model (NAME OF MODEL USED HERE)
+    %Student Option 1 Oswalds Model (Obert)
 
-    eo_mod2(n) = ; %Oswalds Estimate
-    k1_mod2(n) = ;
-    k2_mod2(n) = ; % Optional
+    eo_mod2(n) = 1/(1.05 + 0.0007*pi*Design_Input.AR_w(n)); %O  swalds Estimate
+    k1_mod2(n) = 1/(pi*eo_mod2(n)*Design_Input.AR_w(n));
+    %%k2_mod2(n) = ; % Optional
    
-    %Student Option 2 Oswalds Model (NAME OF MODEL USED HERE)
+    %Student Option 2 Oswalds Model (Kroo)
+    
+    u = 0.99;
+    s = 1-2*((Design_Input.Dia_f(n)/WingGeo_Data.b_w(n))^2);
 
-    eo_mod3(n) = ; %Oswalds Estimate
-    k1_mod3(n) = ;
-    k2_mod3(n) = ; % Optional
+    
+    eo_mod3(n) =  (1/ ( (1/(u*s)) + 0.38 * Parasite_Drag_Data.CDo(n) * pi *Design_Input.AR_w(n) ) ) ; %Oswalds Estimate
+    k1_mod3(n) = 1/(pi*eo_mod3(n)*Design_Input.AR_w(n));
+    %%k2_mod3(n) = ; % Optional
 % /////////////////////////////////////////////////////////////////////////
 % END OF SECTION TO MODIFY
 % /////////////////////////////////////////////////////////////////////////   
