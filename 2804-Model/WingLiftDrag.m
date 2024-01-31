@@ -78,8 +78,8 @@ for n = 1:Count
     a(n)= ( a_0(n) ) / (1 + ( (57.3*a_0(n)) / (pi*e(n)*Design_Input.AR_w(n)) )  ); % 3-D lift curve slope
     WingLiftCurve(n,:) = a(n) * AoA(n); % Evaluate the 3D coefficient of lift values at AoA's in array (AoA) definied above
 
-    % 3D Wing Drag Coefficient
-    WingDragCurve(n,:) = Airfoil{n, (24:35)} + ( (WingLiftCurve(n))^2 / ( pi*e(n)*Design_Input.AR_w(n) ) ) ; % Just the 3D coefficient of drag values at AoA's in array (AoA) definied above
+    % 3D Wing Drag Coefficient CHANGED ?????
+    WingDragCurve(n,:) = Airfoil{n, (24:41)} + ( (WingLiftCurve(n))^2 / ( pi*e(n)*Design_Input.AR_w(n) ) ) ; % Just the 3D coefficient of drag values at AoA's in array (AoA) definied above
 % /////////////////////////////////////////////////////////////////////////
 % END OF SECTION TO MODIFY
 % /////////////////////////////////////////////////////////////////////////
