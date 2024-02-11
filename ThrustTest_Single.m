@@ -50,7 +50,7 @@ bottleSize = 2000; % [ml]
 % Be sure that the above matches up with the file name specified below. In
 % the full "Thrust" script, all of this data will be loaded automatically
 % for you
-testName = 'LA_Test_W0800_B2000'; % Should be a string of the path to the data (including the data file name)
+testName = 'Variable Water Volume/LA_Test_W0800_B2000'; % Should be a string of the path to the data (including the data file name)
 
 % /////////////////////////////////////////////////////////////////////////
 % MODIFY THIS SECTION
@@ -61,104 +61,82 @@ testName = 'LA_Test_W0800_B2000'; % Should be a string of the path to the data (
 fileName = testName; % again weird indexing is due to string arrays, we have to ask for all the characters in a row
 data = readmatrix(fileName); % load the data
 data = data(:,3)*4.448; % take only the third column and converting from lbf to N
-
 dataTime = 0:(1/f):(1/f)*(length(data)-1);
 
-figure();
-hold on;
-plot(dataTime',data);
-
-[x,IndexMax]=max(data);
-timeX = dataTime(IndexMax);
 
 
-l=0;
-for i=IndexMax-100:length(data)
-    if (data(i) >= 0.5)&&(l~=1)
-        timeStart = i;
-        l=1;
-    end
+%% Finds max thrust and crops data to 0.5 seconds
 
-end
+[maxThrust, ~] = max(data); % Finds max thrust index to help find the thrust start and end
 
-
-endSteps = (dataTime(timeStart)+0.5)/(1/f);
-timeEnd = round(endSteps);
-xlim([dataTime(timeStart) dataTime(timeEnd)]);
-xlabel("Time [s]");
-ylabel("Thrust [N]");
-
-
-% AverageSteps(1) = data(round((dataTime(I)+0.3)/(1/f)));
-% AverageSteps(2) = data(round(((dataTime(I)+0.3)/(1/f)) + (100/f)));
-% AverageSteps(3) = data(round(((dataTime(I)+0.3)/(1/f)) + (200/f)));
-% AverageSteps(4) = data(round(((dataTime(I)+0.3)/(1/f)) + (300/f)));
-% AverageSteps(5) = data(round(((dataTime(I)+0.3)/(1/f)) + (400/f)));
-% offset = mean(AverageSteps);
-% data = data - offset;
-
-
-
-
-figure();
-hold on;
-
-
-
-% thrustEndSteps = (dataTime(I)+0.2)/(1/f);
-% timeThrustEnd = round(thrustEndSteps);
-%scatter(dataTime(timeThrustEnd), data(timeThrustEnd), "LineWidth",10);
-
-
-
-
-
-
-
-k = 0;
-for i=length(data):-1:IndexMax
-    if (data(i) >= 10)&&(k~=1)
-        endThrustPoint = i;
-        k=1;
+% Find the start of the thrust impulse
+ifFoundStart = false;
+for i = find(data == maxThrust)-100:length(data) % Starts close to max thrust and moves towards max thrust
+    if (data(i) >= 0.5) && (ifFoundStart ~= true)
+        sectionStartIndex = i;
+        ifFoundStart = true;
     end
 end
+sectionEndIndex = round( (dataTime(sectionStartIndex)+0.5)/(1/f) ); % Adds 0.5s onto the start time
 
-endThrustPointIndex = (dataTime(endThrustPoint)+0.01)/(1/f);
-endThrustPointIndex = round(endThrustPointIndex);
+sectionStartTime = dataTime(sectionStartIndex);
 
-for i=endThrustPointIndex:length(data)
-        data(i) = 0;
-end
+% Crops the data to the 0.5 seconds of wanted thrust data
+data = data(sectionStartIndex:sectionEndIndex);
+dataTime = dataTime(sectionStartIndex:sectionEndIndex);
 
-%scatter(dataTime(endThrustPointIndex), data(endThrustPointIndex), "LineWidth",10, 'MarkerEdgeColor','b');
-timeStartThing = dataTime(timeStart);
+dataTime = dataTime-sectionStartTime; % Modifies the time to the 0.5 seconds
 
-for i=1:length(data)
-    if data(i) < 0
-        data(i) = 0;
-    end
-end
-data = data(timeStart:timeEnd);
-dataTime = dataTime(timeStart:timeEnd);
+RawData = data;
 
-dataTime = dataTime-timeStartThing;
 
-graphOffset = cat(1,zeros(round(.03*f),1), (0:(5/(.25*f)):5)',(zeros(round(.22*f)-1,1)));
-%graphOffset = cat(1,graphOffset,zeros(length(data)-length(graphOffset),1));
-data = data-graphOffset;
-for i=1:length(data)
-    if data(i) < 0
-        data(i) = 0;
-    end
-end
-plot(dataTime',data);
-
-xlabel("Time [s]");
-ylabel("Thrust [N]");
 
 %% Data Conditioning
+% Find the end of the thrust impulse
+ifFoundStart = false;
+for i=length(data):-1:find(data == maxThrust) % Starts at the end and moves towards max thrust
+    if (data(i) >= 10) && (ifFoundStart ~= true)
+        thrustEndIndex = i;
+        ifFoundStart = true;
+    end
+end
+thrustEndIndex = round( (dataTime(thrustEndIndex)+0.01)/(1/f) );
+
+% Sets all data after the end of the impulse to zero
+for i = thrustEndIndex:length(data) 
+        data(i) = 0;
+end
+
+% Modifies the data based on a offset
+dataOffset = cat(1,zeros(round(.03*f),1), (0:(5/(.25*f)):5)',(zeros(round(.22*f)-1,1)));
+ConditionedData = data-dataOffset;
+
+% Sets negative thrust to zero
+for i=1:length(ConditionedData) 
+    if ConditionedData(i) < 0
+        ConditionedData(i) = 0;
+    end
+end
+
+
+figure('Position', [40 350 500 400]); hold on; grid on; grid minor;
+plot(dataTime',RawData);
+plot(dataTime',ConditionedData);
+% scatter(dataTime',RawData,5);
+% scatter(dataTime',ConditionedData,5);
+legend("Raw Data", "Conditioned Data");
+title({"Static Test, Thrust over Time     Test: " + testName(32:33)});
+xlabel("Time [s]");
+ylabel("Thrust [N]");
+
+
 
 %% Data Fitting
+% coefficients = polyfit(dataTime, ConditionedData, 10);
+% xFit = linspace(min(dataTime), max(dataTime));
+% yFit = polyval(coefficients, xFit);
+% 
+% plot(xFit,yFit,'k');
 
 %% Sample onto the standard output array format
 
