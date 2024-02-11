@@ -112,6 +112,7 @@ InducedDrag_Data = ...
 %% Calculations - Dynamic Models
 %%To Be provided at a later date
 % Call Thrust Model
+%[ThrustCurves, Time] = Thrust();
 
 % Call Boost-Ascent Flight Dynamics Model
 
@@ -141,11 +142,11 @@ plot(WingLiftCurve{1,:},WingDragCurve{1,:});
 plot(Benchmark.CL(:),Benchmark.CD(:));
 plot(WingLiftCurve{1,:},DragPolar_mod1{1,:});
 plot(WingLiftCurve{1,:},DragPolar_mod2{1,:});
-%plot(WingLiftCurve,DragPolar_mod3{1,:});
+plot(WingLiftCurve{1,:},DragPolar_mod3{1,:});
 xlabel('Coefficient of Lift (CL)');
 ylabel('Coefficient of Drag (CD)');
 title('Drag Polar Model Comparison');
-legend('Airfoil Drag Polar','Wing Drag Polar','Benchmark Drag Polar','Drag Polar Cavallo','Drag Polar Nita-Scholz','Location','northwest');
+legend('Airfoil Drag Polar','Wing Drag Polar','Benchmark Drag Polar','Drag Polar Cavallo','Drag Polar Obert','Drag Polar Kroo','Location','northwest');
 hold off
 
 figure
@@ -164,12 +165,12 @@ figure
 hold on
 plot(WingLiftCurve{1,:},LD_mod1{1,:},'--');
 plot(WingLiftCurve{1,:},LD_mod2{1,:},'--');
-%plot(WingLiftCurve{1,:},LD_mod3{1,:},'--');
+plot(WingLiftCurve{1,:},LD_mod3{1,:},'--');
 plot(WingLiftCurve{1,:},LD_benchmark{1,:});
 xlabel('Coefficient of Lift (CL)');
 ylabel('L/D Ratio (-)');
 title('Lift over Drag Comparisons - Configuration 1.01');
-legend('L/D Cavallo','L/D Nita-Scholz','L/D Benchmark','Location','southeast');
+legend('L/D Cavallo','L/D Obert','L/D Kroo','L/D Benchmark','Location','southeast');
 hold off
 
 %% To Be provided at a later date

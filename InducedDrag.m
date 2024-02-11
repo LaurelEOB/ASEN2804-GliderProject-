@@ -48,7 +48,7 @@ for n = 1:Count
 
     %Student Option 1 Oswalds Model (Obert)
 
-    eo_mod2(n) = 1/(1.05 + 0.0007*pi*Design_Input.AR_w(n)); %O  swalds Estimate
+    eo_mod2(n) = 1/(1.05 + 0.007*pi*Design_Input.AR_w(n)); %O  swalds Estimate
     k1_mod2(n) = 1/(pi*eo_mod2(n)*Design_Input.AR_w(n));
     %%k2_mod2(n) = ; % Optional
    
