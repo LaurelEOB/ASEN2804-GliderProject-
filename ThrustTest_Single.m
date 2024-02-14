@@ -50,7 +50,7 @@ bottleSize = 2000; % [ml]
 % Be sure that the above matches up with the file name specified below. In
 % the full "Thrust" script, all of this data will be loaded automatically
 % for you
-testName = 'Variable Water Volume/LA_Test_W0800_B2000'; % Should be a string of the path to the data (including the data file name)
+testName = 'Variable Water Volume/LA_Test_W1000_B2000'; % Should be a string of the path to the data (including the data file name)
 
 % /////////////////////////////////////////////////////////////////////////
 % MODIFY THIS SECTION
@@ -72,20 +72,23 @@ dataTime = 0:(1/f):(1/f)*(length(data)-1);
 % Find the start of the thrust impulse
 ifFoundStart = false;
 for i = find(data == maxThrust)-100:length(data) % Starts close to max thrust and moves towards max thrust
-    if (data(i) >= 0.5) && (ifFoundStart ~= true)
+    if (data(i) >= 30) && (ifFoundStart ~= true)
         sectionStartIndex = i;
         ifFoundStart = true;
     end
 end
+sectionStartIndex = sectionStartIndex-8;
+sectionStartTime = dataTime(sectionStartIndex);
 sectionEndIndex = round( (dataTime(sectionStartIndex)+0.5)/(1/f) ); % Adds 0.5s onto the start time
 
-sectionStartTime = dataTime(sectionStartIndex);
+
 
 % Crops the data to the 0.5 seconds of wanted thrust data
 data = data(sectionStartIndex:sectionEndIndex);
 dataTime = dataTime(sectionStartIndex:sectionEndIndex);
 
 dataTime = dataTime-sectionStartTime; % Modifies the time to the 0.5 seconds
+data(1) = 0;
 
 RawData = data;
 
@@ -95,7 +98,7 @@ RawData = data;
 % Find the end of the thrust impulse
 ifFoundStart = false;
 for i=length(data):-1:find(data == maxThrust) % Starts at the end and moves towards max thrust
-    if (data(i) >= 10) && (ifFoundStart ~= true)
+    if (data(i) >= 15) && (ifFoundStart ~= true)
         thrustEndIndex = i;
         ifFoundStart = true;
     end
@@ -132,11 +135,33 @@ ylabel("Thrust [N]");
 
 
 %% Data Fitting
-% coefficients = polyfit(dataTime, ConditionedData, 10);
+offset = -3;
+coefficients = polyfit(dataTime(1:find(data == maxThrust)+offset), ConditionedData(1:find(data == maxThrust)+offset),2);
+xFit = linspace(min(dataTime(1:find(data == maxThrust)+offset)), max(dataTime(1:find(data == maxThrust)+offset)));
+yFit = polyval(coefficients, xFit);
+
+coefficients2 = polyfit(dataTime(find(data == maxThrust)+offset:thrustEndIndex), ConditionedData(find(data == maxThrust)+offset:thrustEndIndex),3);
+xFit2 = linspace(min(dataTime(find(data == maxThrust)+offset:thrustEndIndex)), max(dataTime(find(data == maxThrust)+offset:thrustEndIndex)));
+yFit2 = polyval(coefficients2, xFit2);
+
+% coefficients = polyfit(dataTime, ConditionedData,10);
 % xFit = linspace(min(dataTime), max(dataTime));
 % yFit = polyval(coefficients, xFit);
-% 
-% plot(xFit,yFit,'k');
+
+ylineEnd = zeros(1,length(data)-length(yFit)-length(yFit2)+1);
+yline = cat(2,yFit,yFit2,ylineEnd);
+xline = cat(2,xFit,xFit2,linspace(dataTime(1,thrustEndIndex), dataTime(1,end),length(ylineEnd)));
+yline(1) = 0;
+
+for i=1:length(yline) 
+    if yline(i) < 0
+        yline(i) = 0;
+    end
+end
+
+plot(xline,yline,'k','LineWidth',1);
+
+
 
 %% Sample onto the standard output array format
 
