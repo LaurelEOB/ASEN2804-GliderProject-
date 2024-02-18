@@ -1,4 +1,4 @@
-function [ThrustCurves, Time] = Thrust()
+function [ThrustCurves, peakThrust, durationThrust, Time] = Thrust()
 close all;
 %% Thrust Summary
 % This funciton will take in the file location of the two test setups and
@@ -28,6 +28,7 @@ close all;
 %% Define data locations
 % This is hard coded!!!
 fileLoc_2L = 'Variable Water Volume/'; % path to the data files, be sure to include a trailing slash
+fileLoc_1pt25L = 'Variable Water Volume/'; % path to the data files, be sure to include a trailing slash
 %fileLoc_2L = 'Static Test Stand Data/2000mL Bottle/Variable Volume/'; % path to the data files, be sure to include a trailing slash
 %fileLoc_1pt25L = 'Static Test Stand Data/1250mL Bottle/'; % path to the data files, be sure to include a trailing slash
 
@@ -36,11 +37,11 @@ testInfo_2L = getThrustTestNames(fileLoc_2L);
 configs_2L = unique(testInfo_2L.waterVol);
 numConfigs_2L = length(configs_2L);
 
-% testInfo_1pt25L = getThrustTestNames(fileLoc_1pt25L);
-% configs_1pt25L = unique(testInfo_1pt25L.waterVol);
-% numConfigs_1pt25L = length(configs_1pt25L);
+testInfo_1pt25L = getThrustTestNames(fileLoc_1pt25L);
+configs_1pt25L = unique(testInfo_1pt25L.waterVol);
+numConfigs_1pt25L = length(configs_1pt25L);
 
-numConfigs = numConfigs_2L;% + numConfigs_1pt25L;
+numConfigs = numConfigs_2L + numConfigs_1pt25L;
 
 % Set known sampling frequency
 f= 1652; % [Hz]
@@ -50,7 +51,7 @@ Time = 0:0.001:0.5; % just go ahead and define this, note that it will be 501 lo
 ThrustCurves = zeros(length(Time),numConfigs);
 
 ThrustCurvesNames = {};
-DataAnalysis = table
+
 %% Loop over all of the configurations
 for N = 1:numConfigs % use upper case N to distiguish that it is counting something different from the aerodynamic modeling loops
     %% Dertemine what configuration to use for this iteration in the loop
@@ -67,6 +68,7 @@ for N = 1:numConfigs % use upper case N to distiguish that it is counting someth
         numTests = length(testIndexes); % finds the number of tests performed
         testNames = testInfo_1pt25L.fileNames(testIndexes, :); % pulls all of the test names of interest, weird indexing is due to string arrays
     end
+
 
     % /////////////////////////////////////////////////////////////////////////
     % MODIFY THIS SECTION
@@ -129,7 +131,7 @@ for N = 1:numConfigs % use upper case N to distiguish that it is counting someth
             % Find the end of the thrust impulse
             ifFoundStart = false;
             for i=length(data):-1:find(data == maxThrust) % Starts at the end and moves towards max thrust
-                if (data(i) >= 15) && (ifFoundStart ~= true)
+                if (data(i) >= 20) && (ifFoundStart ~= true)
                     thrustEndIndex = i;
                     ifFoundStart = true;
                 end
@@ -140,9 +142,14 @@ for N = 1:numConfigs % use upper case N to distiguish that it is counting someth
             for i = thrustEndIndex:length(data) 
                     data(i) = 0;
             end
-            
+            if thrustEndIndex > length(dataTime)
+                thrustEndIndex = length(dataTime);
+            end
+            thrustEndTime = dataTime(thrustEndIndex);
+            thrustDuration = thrustEndTime-0.03;
+            thrustOffset = 10;
             % Modifies the data based on a offset
-            dataOffset = cat(1,zeros(round(.03*f),1), (0:(5/(.25*f)):5)',(zeros(round(.22*f)-1,1)));
+            dataOffset = cat(1,zeros(round(.03*f),1), (0:(thrustOffset/(thrustDuration*f)):thrustOffset)',(ones(round((0.5-thrustEndTime)*f)-1,1))*thrustOffset);
             ConditionedData = data-dataOffset;
             
             % Sets negative thrust to zero
@@ -163,14 +170,17 @@ for N = 1:numConfigs % use upper case N to distiguish that it is counting someth
             xlabel("Time [s]");
             
             dataArray(:,j) = ConditionedData(:,1);
-
+    
     
 
     end
 
+
+    
+
     %% Averaging
     averagedData = mean(dataArray');
-    figure('Position', [300 350 500 400]);
+    figure('Position', [500 350 500 400]);
     plot(dataTime,averagedData);
     title("")
     [maxThrustAvg, ~] = max(averagedData);
@@ -220,8 +230,10 @@ for N = 1:numConfigs % use upper case N to distiguish that it is counting someth
     newXaxis = linspace(0,0.5,501);
     tableData = interp1(xline, yline, newXaxis);
     thrustOut = tableData;
-    figure('Position', [800 350 500 400]);
+    figure('Position', [1000 350 500 400]);
     plot(newXaxis,tableData);
+
+    
 
 
 % /////////////////////////////////////////////////////////////////////////
@@ -231,9 +243,18 @@ for N = 1:numConfigs % use upper case N to distiguish that it is counting someth
     % It is very important that the data is 501 elements long corresponding
     % to 0-0.5 seconds of time at this point!!!
     ThrustCurves(:, N) = thrustOut;
+    %ThrustData(:, N) = 
     % Header naming convention of <bottle size (in ml)>_<water volume (in ml)>
     ThrustCurvesNames{N} = [bottleSize, '_', num2str(waterSize)];
+    %ThrustData{N} = 
+
+    peakThrust(N) = max(averagedData);
+    durationThrust(N) = dataTime(thrustEndIndexAvg);
+
 end
+
+
 ThrustCurves = array2table(ThrustCurves);
 ThrustCurves.Properties.VariableNames = ThrustCurvesNames;
+
 end

@@ -175,7 +175,7 @@ hold off
 
 %% To Be provided at a later date
 %Static Test Thrust Profle Model Plots
-[ThrustCurves, Time] = Thrust();
+[ThrustCurves, peakThrust, duration, Time] = Thrust();
 %Boost_Ascent Flight Profile Plots
 
 %Glide Flight Profile Plots
