@@ -173,10 +173,103 @@ title('Lift over Drag Comparisons - Configuration 1.01');
 legend('L/D Cavallo','L/D Obert','L/D Kroo','L/D Benchmark','Location','southeast');
 hold off
 
+%% Reset default color order
+set(0,'DefaultAxesColorOrder','default')
+
+
 %% To Be provided at a later date
 %Static Test Thrust Profle Model Plots
 [ThrustCurves, peakThrust, duration, Time] = Thrust();
-%Boost_Ascent Flight Profile Plots
+
+%% Boost_Ascent Flight Profile Plots
+[apogee, hApogee, stateStruct] = BoostAscent(Design_Input, ATMOS, Parasite_Drag_Data, Weight_Data, ThrustCurves, Time, Count);
+% Some setup to make plots more readable in color, look up the
+% documentation for 'cmap' for other color map options
+cmap = colormap(parula(Count));
+set(0,'DefaultAxesColorOrder',cmap)
+set(gca(),'ColorOrder',cmap);
+
+fields = fieldnames(stateStruct);
+figure(20)
+for n = 1:Count
+    distBoost = vecnorm([stateStruct.(fields{n}).data(:, 4), stateStruct.(fields{n}).data(:, 5)], 2, 2);
+    plot(distBoost,...
+            -stateStruct.(fields{n}).data(:, 6), ...
+            DisplayName=Design_Input.Properties.RowNames{n}, Color=cmap(n, :))
+    if n == 1
+        hold on
+    end
+end
+xlabel('Total Distance Traveled [m]');
+ylabel('Height Achieved [m]');
+title('Boost 2D Total Distance Traveled');
+legend();
+grid on
+hold off
+
+figure(21)
+for n = 1:Count
+    plot(stateStruct.(fields{n}).data(:, 4),...
+            stateStruct.(fields{n}).data(:, 5), ...
+            DisplayName=Design_Input.Properties.RowNames{n}, Color=cmap(n, :))
+    if n == 1
+        hold on
+    end
+end
+xlabel('y [m] - Positive = East');
+ylabel('x [m] - Positive = North');
+title('Boost Ground Track');
+legend();
+grid on
+hold off
+
+figure(22)
+for n = 1:Count    
+    plot3(stateStruct.(fields{n}).data(:, 4),...
+            stateStruct.(fields{n}).data(:, 5),...
+            stateStruct.(fields{n}).data(:, 6), ...
+            DisplayName=Design_Input.Properties.RowNames{n})
+    if n == 1
+        hold on
+    end
+end
+xlabel('x [m] - Positive = North');
+ylabel('y [m] - Positive = East');
+zlabel('z [m] - Positive = Down');
+title('Boost Trajectory Plots');
+set(gca, 'ZDir','reverse')
+set(gca, 'YDir','reverse')
+legend();
+grid on
+axis equal
+hold off
+
+figure(23)
+for n = 1:Count
+    Wx = -Design_Input.V_wind(n)*cosd(Design_Input.Wind_Az(n)); 
+    Wy = -Design_Input.V_wind(n)*sind(Design_Input.Wind_Az(n));
+    quiver3(stateStruct.(fields{n}).data(:, 4), ... % x
+        stateStruct.(fields{n}).data(:, 5), ... % y
+        stateStruct.(fields{n}).data(:, 6), ... % z
+        stateStruct.(fields{n}).data(:, 1)-Wx, ... % Vax
+        stateStruct.(fields{n}).data(:, 2)-Wy, ... % Vay
+        stateStruct.(fields{n}).data(:, 3), ... % Vz
+        DisplayName=Design_Input.Properties.RowNames{n}, ...
+        LineWidth=2)
+    if n == 1
+        hold on
+    end
+end
+xlabel('x [m] - Positive = North');
+ylabel('y [m] - Positive = East');
+zlabel('z [m] - Positive = Down');
+title('Boost Trajectory Plots with Heading Vetors');
+set(gca, 'ZDir','reverse')
+set(gca, 'YDir','reverse')
+legend();
+grid on
+axis equal
+hold off
 
 %Glide Flight Profile Plots
 

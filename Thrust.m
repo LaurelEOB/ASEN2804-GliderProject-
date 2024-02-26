@@ -27,8 +27,8 @@ close all;
 
 %% Define data locations
 % This is hard coded!!!
-fileLoc_2L = 'Variable Water Volume/'; % path to the data files, be sure to include a trailing slash
-fileLoc_1pt25L = 'Variable Water Volume/'; % path to the data files, be sure to include a trailing slash
+fileLoc_2L = 'Variable Water Volume 2 liter/'; % path to the data files, be sure to include a trailing slash
+fileLoc_1pt25L = 'Variable Water Volume 1.25 liter/'; % path to the data files, be sure to include a trailing slash
 %fileLoc_2L = 'Static Test Stand Data/2000mL Bottle/Variable Volume/'; % path to the data files, be sure to include a trailing slash
 %fileLoc_1pt25L = 'Static Test Stand Data/1250mL Bottle/'; % path to the data files, be sure to include a trailing slash
 
@@ -160,14 +160,14 @@ for N = 1:numConfigs % use upper case N to distiguish that it is counting someth
             end
             
             
-            figure('Position', [40 350 500 400]); hold on; grid on; grid minor;
-            plot(dataTime',RawData);
-            plot(dataTime',ConditionedData);
-            % scatter(dataTime',RawData,5);
-            % scatter(dataTime',ConditionedData,5);
-            legend("Raw Data", "Conditioned Data");
-            title("Static Test, Thrust over Time");
-            xlabel("Time [s]");
+            % figure('Position', [40 350 500 400]); hold on; grid on; grid minor;
+            % plot(dataTime',RawData);
+            % plot(dataTime',ConditionedData);
+            % % scatter(dataTime',RawData,5);
+            % % scatter(dataTime',ConditionedData,5);
+            % legend("Raw Data", "Conditioned Data");
+            % title("Static Test, Thrust over Time");
+            % xlabel("Time [s]");
             
             dataArray(:,j) = ConditionedData(:,1);
     
@@ -180,9 +180,9 @@ for N = 1:numConfigs % use upper case N to distiguish that it is counting someth
 
     %% Averaging
     averagedData = mean(dataArray');
-    figure('Position', [500 350 500 400]);
-    plot(dataTime,averagedData);
-    title("")
+    % figure('Position', [500 350 500 400]);
+    % plot(dataTime,averagedData);
+    % title("")
     [maxThrustAvg, ~] = max(averagedData);
     % Note that averaging should accour before data fitting. Technically
     % either can be done, but the output will be much more smooth if the
@@ -230,8 +230,8 @@ for N = 1:numConfigs % use upper case N to distiguish that it is counting someth
     newXaxis = linspace(0,0.5,501);
     tableData = interp1(xline, yline, newXaxis);
     thrustOut = tableData;
-    figure('Position', [1000 350 500 400]);
-    plot(newXaxis,tableData);
+    % figure('Position', [1000 350 500 400]);
+    % plot(newXaxis,tableData);
 
     
 

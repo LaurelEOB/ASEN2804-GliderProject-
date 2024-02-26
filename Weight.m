@@ -75,10 +75,10 @@ for n = 1:Count
 
     %Pressure vessel (Coke Bottle) Weight
     if Design_Input.Bottle_Vol(n)==1.25
-        W_bottle(n) = (0.048/1000)*9.81; %1.25 liter bottle direct measurement 50 grams to Newtons
+        W_bottle(n) = (0.048)*9.81; %1.25 liter bottle direct measurement 50 grams to Newtons
         CG_bottle(n) = 0; %1.25 liter bottle direct measurement (Newtons)
     else
-        W_bottle(n) = (0.063/1000)*9.81; %2 liter bottle direct measurement 68 grams to Newtons
+        W_bottle(n) = (0.063)*9.81; %2 liter bottle direct measurement 68 grams to Newtons
         CG_bottle(n) = 0; %2 liter bottle direct measurement (Newtons)
     end
     
