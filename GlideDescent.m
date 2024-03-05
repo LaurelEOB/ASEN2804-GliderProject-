@@ -38,24 +38,26 @@ for n = 1:Count
     % MODIFY THIS SECTION
     % /////////////////////////////////////////////////////////////////////////
     %% Find L/D max
-
-    LDmax(n) = ;
+    new_LD = table2array(LD);  %convert LD mod from table to usable array
+    [LDmax(n), LDmax_index(n)] = max(new_LD(n,:)); 
 
     %% Find best glide range
-    bestGlide(n) = ;
+    bestGlide(n) = LDmax(n) * -apogee(n);
 
-    %% GLide angle
-    theta(n) = ;
+    %% Glide angle
+    theta(n) = atand( 1/LDmax(n) );
 
     %% Find Best Glide CL and Velocity
-    CL_LDmax(n) = ;
-    V_LDmax(n) = ;   
-    Vsink(n) = ;
+    CL_LDmax(n) = table2array(WingLiftCurve(n,LDmax_index(n))); %where cl values
+    V_LDmax(n) = sqrt( (2*Weight_Data.Wo(n))/ (ATMOS.rho(n) * CL_LDmax(n) * Design_Input.Sref_w(n)) );   
+    Vsink(n) = V_LDmax(n) * sind(theta(n));
 
-    AoA_LDmax(n) = ;
+    AoA_LDmax(n) = (CL_LDmax(n)/WingLiftModel.a(n)) + WingLiftModel.AoA_0(n) ;
 
     %% Find Wing Loading
-    WingLoading(n) = ;
+    
+
+    WingLoading(n) = Weight_Data.Wo(n) / Design_Input.Sref_w(n);
     % /////////////////////////////////////////////////////////////////////////
     % END OF SECTION TO MODIFY
     % /////////////////////////////////////////////////////////////////////////

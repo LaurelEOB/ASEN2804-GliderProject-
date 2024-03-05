@@ -11,6 +11,7 @@ clear
 close all
 clc;
 
+
 % removes warnings for table variable names for a cleaner output
 warning('OFF', 'MATLAB:table:ModifiedAndSavedVarnames')
 
@@ -111,8 +112,7 @@ InducedDrag_Data = ...
 
 %% Calculations - Dynamic Models
 %%To Be provided at a later date
-% Call Thrust Model
-%[ThrustCurves, Time] = Thrust();
+
 
 % Call Boost-Ascent Flight Dynamics Model
 
@@ -173,24 +173,27 @@ title('Lift over Drag Comparisons - Configuration 1.01');
 legend('L/D Cavallo','L/D Obert','L/D Kroo','L/D Benchmark','Location','southeast');
 hold off
 
-%% Reset default color order
-set(0,'DefaultAxesColorOrder','default')
+
 
 
 %% To Be provided at a later date
 %Static Test Thrust Profle Model Plots
 [ThrustCurves, peakThrust, duration, Time] = Thrust();
+% ThrustSample5 = ThrustCurves.("2000_1000");
+% figure();
+% plot(Time,ThrustSample5);
 
 %% Boost_Ascent Flight Profile Plots
 [apogee, hApogee, stateStruct] = BoostAscent(Design_Input, ATMOS, Parasite_Drag_Data, Weight_Data, ThrustCurves, Time, Count);
+%% Boost_Ascent Flight Profile Plots
 % Some setup to make plots more readable in color, look up the
 % documentation for 'cmap' for other color map options
-cmap = colormap(parula(Count));
+cmap = colormap(winter(Count));
 set(0,'DefaultAxesColorOrder',cmap)
 set(gca(),'ColorOrder',cmap);
 
 fields = fieldnames(stateStruct);
-figure(20)
+figure();
 for n = 1:Count
     distBoost = vecnorm([stateStruct.(fields{n}).data(:, 4), stateStruct.(fields{n}).data(:, 5)], 2, 2);
     plot(distBoost,...
@@ -207,7 +210,7 @@ legend();
 grid on
 hold off
 
-figure(21)
+figure();
 for n = 1:Count
     plot(stateStruct.(fields{n}).data(:, 4),...
             stateStruct.(fields{n}).data(:, 5), ...
@@ -223,7 +226,7 @@ legend();
 grid on
 hold off
 
-figure(22)
+figure();
 for n = 1:Count    
     plot3(stateStruct.(fields{n}).data(:, 4),...
             stateStruct.(fields{n}).data(:, 5),...
@@ -244,7 +247,7 @@ grid on
 axis equal
 hold off
 
-figure(23)
+figure();
 for n = 1:Count
     Wx = -Design_Input.V_wind(n)*cosd(Design_Input.Wind_Az(n)); 
     Wy = -Design_Input.V_wind(n)*sind(Design_Input.Wind_Az(n));
@@ -271,9 +274,42 @@ grid on
 axis equal
 hold off
 
+%% Reset default color order
+set(0,'DefaultAxesColorOrder','default')
+
 %Glide Flight Profile Plots
+[GlideData] = GlideDescent(LD_mod1, apogee, Design_Input, ATMOS, Weight_Data, WingLiftModel, WingLiftCurve, Count);
 
 %Merged Boost-Ascent+Glide Flight Profile
 
+% plot Cdi vs Cdl
+figure()
+hold on
+
+newAirfoil = Airfoil{1,(24:41)} - min(Airfoil{1,(24:41)});
+newWingDragCurve = WingDragCurve{1,:} - min(WingDragCurve{1,:});
+
+plot(AirfoilLiftCurve{1,:},newAirfoil);
+plot(WingLiftCurve{1,:},newWingDragCurve);
+
+
+newDragPolar_mod1 = DragPolar_mod1{1,:} - min(DragPolar_mod1{1,:});
+newDragPolar_mod2 = DragPolar_mod2{1,:} - min(DragPolar_mod2{1,:});
+newDragPolar_mod3 = DragPolar_mod3{1,:} - min(DragPolar_mod3{1,:});
+
+newBenchmark = Benchmark.CD(:) - min(Benchmark.CD(:));
+
+plot(Benchmark.CL(:),newBenchmark);
+plot(WingLiftCurve{1,:},newDragPolar_mod1(1,:));
+plot(WingLiftCurve{1,:},newDragPolar_mod2(1,:));
+plot(WingLiftCurve{1,:},newDragPolar_mod3(1,:));
+
+
+
+xlabel('Coefficient of Lift (CL)');
+ylabel('Induced Drag (CD)');
+title('Induced Drag Polar Model Comparison');
+legend('Airfoil Drag Polar','Wing Drag Polar','Benchmark Drag Polar','Drag Polar Cavallo','Drag Polar Obert','Drag Polar Kroo','Location','northwest');
+hold off
 
 

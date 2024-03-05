@@ -1,5 +1,5 @@
 function [ThrustCurves, peakThrust, durationThrust, Time] = Thrust()
-close all;
+%  figure();
 %% Thrust Summary
 % This funciton will take in the file location of the two test setups and
 % using the file names in those directories, will pull out all of the
@@ -160,16 +160,20 @@ for N = 1:numConfigs % use upper case N to distiguish that it is counting someth
             end
             
             
-            % figure('Position', [40 350 500 400]); hold on; grid on; grid minor;
-            % plot(dataTime',RawData);
-            % plot(dataTime',ConditionedData);
-            % % scatter(dataTime',RawData,5);
-            % % scatter(dataTime',ConditionedData,5);
-            % legend("Raw Data", "Conditioned Data");
-            % title("Static Test, Thrust over Time");
-            % xlabel("Time [s]");
+%             figure('Position', [40 350 500 400]); hold on; grid on; grid minor;
+%             plot(dataTime',RawData);
+%             plot(dataTime',ConditionedData);
+%             % scatter(dataTime',RawData,5);
+%             % scatter(dataTime',ConditionedData,5);
+%             legend("Raw Data", "Conditioned Data");
+%             %title("Static Test Example, Thrust over Time");
+%             title(fileName);
+%             xlabel("Time [s]");
+%             ylabel("Thrust [N]");
             
             dataArray(:,j) = ConditionedData(:,1);
+            peakSTD(:,j) = maxThrust;
+            timeDur(:,j) = thrustEndTime;
     
     
 
@@ -180,9 +184,15 @@ for N = 1:numConfigs % use upper case N to distiguish that it is counting someth
 
     %% Averaging
     averagedData = mean(dataArray');
-    % figure('Position', [500 350 500 400]);
-    % plot(dataTime,averagedData);
-    % title("")
+    peakSTDvalue(N) = std(peakSTD);
+    timeDurSTD(N) = std(timeDur);
+
+%     figure('Position', [500 350 500 400]);
+%     hold on;
+%     scatter(dataTime,averagedData,20,"blue");
+%     title("Average Static Test Example, Thrust over Time");
+%     xlabel("Time [s]");
+%     ylabel("Thrust [N]");
     [maxThrustAvg, ~] = max(averagedData);
     % Note that averaging should accour before data fitting. Technically
     % either can be done, but the output will be much more smooth if the
@@ -221,8 +231,8 @@ for N = 1:numConfigs % use upper case N to distiguish that it is counting someth
             yline(i) = 0;
         end
     end
-    hold on;
-    plot(xline,yline,'k','LineWidth',1);
+%     hold on;
+%     plot(xline,yline,'k','LineWidth',1);
 
     C = unique(xline,"first");
 
@@ -230,8 +240,13 @@ for N = 1:numConfigs % use upper case N to distiguish that it is counting someth
     newXaxis = linspace(0,0.5,501);
     tableData = interp1(xline, yline, newXaxis);
     thrustOut = tableData;
-    % figure('Position', [1000 350 500 400]);
-    % plot(newXaxis,tableData);
+%     % figure('Position', [1000 350 500 400]);
+%     text(0.08,200,"T(t) = "+round(coefficients(3),3,'significant')+" + "+round(coefficients(2),3,'significant')+"t + "+round(coefficients(1),3,'significant')+"t^2    0\leqt<"+round(dataTime(find(averagedData == maxThrustAvg)+offset),2,'significant'));
+%     text(0.08,180,"T(t) = "+round(coefficients2(3),3,'significant')+" + "+round(coefficients2(2),3,'significant')+"t + "+round(coefficients2(1),3,'significant')+"t^2    "+round(dataTime(find(averagedData == maxThrustAvg)+offset),2,'significant')+"\leqt<"+round(dataTime(thrustEndIndexAvg),2,'significant'));
+%     text(0.08,160,"T(t) = 0        "+round(dataTime(thrustEndIndexAvg),2,'significant')+"\leqt<"+round(dataTime(end),2,'significant'));
+%     plot(newXaxis,tableData,'k',"LineWidth",2);
+% 
+%     legend("Conditioned Data", "Fit Curve");
 
     
 
