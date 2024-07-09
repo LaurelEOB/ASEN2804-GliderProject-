@@ -50,11 +50,12 @@ for n = 1:Count
 % MODIFY THIS SECTION
 % /////////////////////////////////////////////////////////////////////////
     %Fuselage Weight & CG Estimate
-    W_f(n)=Material_Data.rhoA_foamboard(1)*Design_Input.Swet_f(n)*9.81; %Assumes fuselage created from foamboard; units of Newtons
+    % Added weight due to glue sticks
+    W_f(n)=Material_Data.rhoA_foamboard(1)*Design_Input.Swet_f(n)*9.81+2; %Assumes fuselage created from foamboard; units of Newtons
     CG_f(n) = Design_Input.Length_f(n)/2; %Approximate location of fuselage CG from nose (m)
 
     %Wing Weight Estimate
-    W_w(n)=Material_Data.rho_pinkfoam(1)*Design_Input.Sref_w(n)*Airfoil.Thick_w(n)*WingGeo_Data.MAC_w(n)*9.81; %Assumes pink foam; units of Newtons
+    W_w(n)=Material_Data.rhoA_foamboard(1)*Design_Input.Sref_w(n)*Airfoil.Thick_w(n)*WingGeo_Data.MAC_w(n)*9.81; %Assumes foamboard; units of Newtons
     CG_w(n) = 0;
 
     %Horz Tail 1 Weight Estimate

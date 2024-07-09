@@ -11,22 +11,23 @@ clear
 close all
 clc;
 
+inputFile = "DesignInputFINAL.xlsx";
 
 % removes warnings for table variable names for a cleaner output
 warning('OFF', 'MATLAB:table:ModifiedAndSavedVarnames')
 
 %% Import and Read Aircraft Design File
-Design_Input = readtable("Design Input File.xlsx",'Sheet','Input','ReadRowNames',true); %Read in Aircraft Geometry File
+Design_Input = readtable(inputFile,'Sheet','Input','ReadRowNames',true); %Read in Aircraft Geometry File
 Count = height(Design_Input); %Number of different aircraft configurations in geometry file
 
 % Import Airfoil Data File
-Airfoil = readtable("Design Input File.xlsx",'Sheet','Airfoil_Data'); %Read in Airfoil Data
+Airfoil = readtable(inputFile,'Sheet','Airfoil_Data'); %Read in Airfoil Data
 
 % Import Benchmark Aircraft Truth Data
-Benchmark = readtable("Design Input File.xlsx",'Sheet','Benchmark_Truth'); %Read in Benchmark "Truth" Data for model validation only
+Benchmark = readtable(inputFile,'Sheet','Benchmark_Truth'); %Read in Benchmark "Truth" Data for model validation only
 
 % Import Material Properties Data
-Material_Data = readtable("Design Input File.xlsx",'Sheet','Materials'); %Read in prototyp material densities for weight model
+Material_Data = readtable(inputFile,'Sheet','Materials'); %Read in prototyp material densities for weight model
 
 %% Caluations - Conditions and Sizing
 % US Standard Atmophere - uses provided MATLAB File Exchange function
@@ -109,13 +110,12 @@ InducedDrag_Data = ...
 % Call Weight Model
 [Weight_Data,CG_Data] = ...
     Weight(Design_Input,Count,WingGeo_Data,Airfoil,Material_Data);
+%Weight_Data{2,"Wo"} = 0.961 * 9.81;
+
 
 %% Calculations - Dynamic Models
 %%To Be provided at a later date
-
-
 % Call Boost-Ascent Flight Dynamics Model
-
 % Call Glide Flight Dynamics Model
 
 
@@ -185,6 +185,7 @@ hold off
 
 %% Boost_Ascent Flight Profile Plots
 [apogee, hApogee, stateStruct] = BoostAscent(Design_Input, ATMOS, Parasite_Drag_Data, Weight_Data, ThrustCurves, Time, Count);
+
 %% Boost_Ascent Flight Profile Plots
 % Some setup to make plots more readable in color, look up the
 % documentation for 'cmap' for other color map options
@@ -282,7 +283,7 @@ set(0,'DefaultAxesColorOrder','default')
 
 %Merged Boost-Ascent+Glide Flight Profile
 
-% plot Cdi vs Cdl
+%% plot Cdi vs Cdl
 figure()
 hold on
 
@@ -291,7 +292,6 @@ newWingDragCurve = WingDragCurve{1,:} - min(WingDragCurve{1,:});
 
 plot(AirfoilLiftCurve{1,:},newAirfoil);
 plot(WingLiftCurve{1,:},newWingDragCurve);
-
 
 newDragPolar_mod1 = DragPolar_mod1{1,:} - min(DragPolar_mod1{1,:});
 newDragPolar_mod2 = DragPolar_mod2{1,:} - min(DragPolar_mod2{1,:});
@@ -304,12 +304,62 @@ plot(WingLiftCurve{1,:},newDragPolar_mod1(1,:));
 plot(WingLiftCurve{1,:},newDragPolar_mod2(1,:));
 plot(WingLiftCurve{1,:},newDragPolar_mod3(1,:));
 
-
-
 xlabel('Coefficient of Lift (CL)');
 ylabel('Induced Drag (CD)');
 title('Induced Drag Polar Model Comparison');
 legend('Airfoil Drag Polar','Wing Drag Polar','Benchmark Drag Polar','Drag Polar Cavallo','Drag Polar Obert','Drag Polar Kroo','Location','northwest');
 hold off
 
+
+
+%% Trade Study Code
+% Input and title based on changing variable
+tradeStudy_changedVariable = Design_Input{:,'Sweep_w'};
+tradeStudy_bestGlide = GlideData{:,'bestGlide'};
+changedTitle = "Sweep [deg]";
+changedTitle2 = "Sweep";
+
+% Glide Distance vs. changing variable
+figure('Position', [40 60 400 300]); hold on; grid on; grid minor;
+title(changedTitle2+" vs. Glide Range");
+plot(tradeStudy_changedVariable(1:end),tradeStudy_bestGlide(1:end),'LineWidth',2);
+scatter(tradeStudy_changedVariable(1:end),tradeStudy_bestGlide(1:end),15,'blue','filled');
+xlabel(changedTitle);
+ylabel("Best Glide Distance [m]");
+
+% Vsink vs. changing variable
+tradeStudy_Vsink = GlideData{:,'Vsink'};
+figure('Position', [40 60 400 300]); hold on; grid on; grid minor;
+title(changedTitle2+" vs. Vsink");
+plot(tradeStudy_changedVariable(1:end),tradeStudy_Vsink(1:end),'LineWidth',2);
+scatter(tradeStudy_changedVariable(1:end),tradeStudy_Vsink(1:end),15,'blue','filled');
+xlabel(changedTitle);
+ylabel("Vsink [m/s]");
+
+% Wing Loading vs. changing variable
+tradeStudy_wingLoading = GlideData{:,'WingLoading'};
+figure('Position', [40 60 400 300]); hold on; grid on; grid minor;
+title(changedTitle2+" vs. Wing Loading");
+plot(tradeStudy_changedVariable(1:end),tradeStudy_wingLoading(1:end),'LineWidth',2);
+scatter(tradeStudy_changedVariable(1:end),tradeStudy_wingLoading(1:end),15,'blue','filled');
+xlabel(changedTitle);
+ylabel("Wing Loading [N/m^2]");
+
+% Apogee vs. changing variable
+tradeStudy_apogee = apogee;
+figure('Position', [40 60 400 300]); hold on; grid on; grid minor;
+title(changedTitle2+" vs. Apogee");
+plot(tradeStudy_changedVariable(1:end),tradeStudy_apogee(1:end)*-1,'LineWidth',2);
+scatter(tradeStudy_changedVariable(1:end),tradeStudy_apogee(1:end)*-1,15,'blue','filled');
+xlabel(changedTitle);
+ylabel("Apogee [m]");
+
+% V_LDmax vs. changing variable
+tradeStudy_VLDmax = GlideData{:,'V_LDmax'};
+figure('Position', [40 60 400 300]); hold on; grid on; grid minor;
+title(changedTitle2+" vs. V_L_D_m_a_x");
+plot(tradeStudy_changedVariable(1:end),tradeStudy_VLDmax(1:end),'LineWidth',2);
+scatter(tradeStudy_changedVariable(1:end),tradeStudy_VLDmax(1:end),15,'blue','filled');
+xlabel(changedTitle);
+ylabel("V_L_D_m_a_x [m/s]");
 

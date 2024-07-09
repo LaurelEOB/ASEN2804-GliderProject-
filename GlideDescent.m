@@ -49,7 +49,8 @@ for n = 1:Count
 
     %% Find Best Glide CL and Velocity
     CL_LDmax(n) = table2array(WingLiftCurve(n,LDmax_index(n))); %where cl values
-    V_LDmax(n) = sqrt( (2*Weight_Data.Wo(n))/ (ATMOS.rho(n) * CL_LDmax(n) * Design_Input.Sref_w(n)) );   
+    CD_LDmax = table2array(WingLiftCurve(n,LDmax_index(n)));
+    V_LDmax(n) = sqrt( (2*(Weight_Data.Wo(n)-Weight_Data.W_water(n)))/ (ATMOS.rho(n) * CL_LDmax(n) * Design_Input.Sref_w(n)) );   
     Vsink(n) = V_LDmax(n) * sind(theta(n));
 
     AoA_LDmax(n) = (CL_LDmax(n)/WingLiftModel.a(n)) + WingLiftModel.AoA_0(n) ;

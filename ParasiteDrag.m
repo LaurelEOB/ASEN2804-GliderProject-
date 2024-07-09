@@ -61,22 +61,32 @@ for n = 1:Count
     (Cf_f * FF_f(n) * Design_Input.Q_f(n) * Design_Input.Swet_f(n))
     CDo_f(n) = (Cf_f * FF_f(n) * Design_Input.Q_f(n) * Design_Input.Swet_f(n)) %Contribution of Fuselage to CDo
 
+    if FF_f(n) < 1
+        FF_f(n) = 1;
+    end
     %% Wing Contribution to CDo
     Re_w = (Design_Input.V_o(n)*WingGeo_Data.MAC_w(n))./ATMOS.nu(n); %Wing Re
     Cf_w = 0.074/(Re_w^0.2) %Wing Flat Plate Coef of Friction for Turbulent Flow
     FF_w(n) = (1 + ((0.6/(Airfoil.X_thick_w(n)))*(Airfoil.Thick_w(n))) ...
         + (100*((Airfoil.Thick_w(n))^4)))*(1.35*(Mach^0.18)*(cosd(Design_Input.Sweep_w(n))^0.28)) %Wing Form Factor
-
+    if FF_w(n) < 1
+        FF_w(n) = 1;
+    end
     CDo_w(n) = (Cf_w * FF_w(n) * Design_Input.Q_w(n) * Design_Input.Swet_w(n)) %Contribution of Wing to CDo
 
+    
     %% Horizontal Tail #1 Contribution to CDo
     if Design_Input.Swet_h1(n)~=0 % If this component exists:
         Re_h1 = (Design_Input.V_o(n)*Design_Input.MAC_h1(n))./ATMOS.nu(n); %Horz Tail Re
         Cf_h1 = 0.074/(Re_h1^0.2); %Flat Plate Coef of Friction for Turbulent Flow
         FF_h1(n) = (1+((0.6/(Airfoil.X_thick_h1(n)))*(Airfoil.Thick_h1(n))) ...
             + (100*((Airfoil.Thick_h1(n))^4)))*(1.35*(Mach^0.18)*(cosd(Design_Input.Sweep_h1(n))^0.28)); %Horz Tail Form Factor
+        if FF_h1(n) < 1
+            FF_h1(n) = 1;
+        end
 
         CDo_h1(n) = (Cf_h1 * FF_h1(n) * Design_Input.Q_h1(n) * Design_Input.Swet_h1(n)) %Contribution of Horz Tail 1 to CDo 
+        
     end
 
     %% Horizontal Tail #2 Contribution to CDo
@@ -85,7 +95,9 @@ for n = 1:Count
         Cf_h2 = 0.074/(Re_h2^0.2); %Flat Plate Coef of Friction for Turbulent Flow
         FF_h2(n) = (1+((0.6/(Airfoil.X_thick_h2(n)))*(Airfoil.Thick_h2(n))) ...
             + (100*((Airfoil.Thick_h2(n))^4)))*(1.35*(Mach^0.18)*(cosd(Design_Input.Sweep_h2(n))^0.28)); %Horz Tail Form Factor
-
+        if FF_h2(n) < 1
+            FF_h2(n) = 1;
+        end
         CDo_h2(n) = (Cf_h2*FF_h2(n)*Design_Input.Q_h2(n)*Design_Input.Swet_h2(n)) %Contribution of Horz Tail 2 to CDo 
     end
 
@@ -95,7 +107,9 @@ for n = 1:Count
         Cf_v1 = 0.074/(Re_v1^0.2); %Flat Plate Coef of Friction for Turbulent Flow
         FF_v1(n) = (1+((0.6/(Airfoil.X_thick_v1(n)))*(Airfoil.Thick_v1(n))) ...
             + (100*((Airfoil.Thick_v1(n))^4)))*(1.35*(Mach^0.18)*(cosd(Design_Input.Sweep_v1(n))^0.28)); %Horz Tail Form Factor
-
+        if FF_v1(n) < 1
+            FF_v1(n) = 1;
+        end
         CDo_v1(n) = (Cf_v1 * FF_v1(n) * Design_Input.Q_v1(n) * Design_Input.Swet_v1(n)) %Contribution of Vert Tail 1 to CDo 
     end
 
@@ -105,7 +119,9 @@ for n = 1:Count
         Cf_v2 = 0.074/(Re_v2^0.2); %Flat Plate Coef of Friction for Turbulent Flow
         FF_v2(n) = (1+((0.6/(Airfoil.X_thick_v2(n)))*(Airfoil.Thick_v2(n))) ...
             + (100*((Airfoil.Thick_v2(n))^4)))*(1.35*(Mach^0.18)*(cosd(Design_Input.Sweep_v2(n))^0.28)); %Horz Tail Form Factor
-
+        if FF_v2(n) < 1
+            FF_v2(n) = 1;
+        end
         CDo_v2(n) = (Cf_v2*FF_v2(n)*Design_Input.Q_v2(n)*Design_Input.Swet_v2(n)) %Contribution of Vert Tail 2 to CDo
     end
 
